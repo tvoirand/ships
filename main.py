@@ -70,30 +70,38 @@ mu = 398600.0
 
 SCALE = 0.0005
 
-time_list = np.arange(0, 86400, 100)
+vertices_list = []
 
-vertices = (np.zeros((len(time_list), 4), dtype = np.float32))
+ship_count = 0
 
-for i in range(len(time_list)):
+for shift in range(0, 6000, 1000):
 
-    vertices[i, 0] = time_list[i]
+    time_list = np.arange(0, 86400, 100) + shift
 
-    vertices[i, 1:] = SCALE * from_orbital_to_cartesian_coordinates(
-        a,
-        e,
-        i,
-        raan,
-        om,
-        time_list[i],
-        mu
-    )
+    vertices_list.append(np.zeros((len(time_list), 4), dtype = np.float32))
 
-def display_animation(vertices):
+    for i in range(len(time_list)):
+
+        vertices_list[ship_count][i, 0] = time_list[i]
+
+        vertices_list[ship_count][i, 1:] = SCALE * from_orbital_to_cartesian_coordinates(
+            a,
+            e,
+            i,
+            raan,
+            om,
+            time_list[i],
+            mu
+        )
+
+    ship_count += 1
+
+def display_animation(vertices_list):
     """
     Displays animation.
 
     Input:
-    - vertices      numpy array of floats (shape (nb_of_steps, 4))
+    - vertices      list of numpy arrays of floats (shape (nb_of_steps, 4))
                     columns contain: time elapsed, x-coord, y-coord, z-coord
     """
 
@@ -113,9 +121,11 @@ def display_animation(vertices):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         # resetting counter to zero when whole array displayed
-        if count == (vertices.shape[0] - 1):
+        if count == (vertices_list[0].shape[0] - 1):
 
-            framemod.draw_line((vertices[count, 1:], vertices[0, 1:]))
+            for ship in range(len(vertices_list)):
+
+                framemod.draw_line((vertices_list[ship][count, 1:], vertices_list[ship][0, 1:]))
 
             count = 0
 
@@ -125,7 +135,9 @@ def display_animation(vertices):
 
         else:
 
-            framemod.draw_line((vertices[count, 1:], vertices[count + 1, 1:]))
+            for ship in range(len(vertices_list)):
+
+                framemod.draw_line((vertices_list[ship][count, 1:], vertices_list[ship][count + 1, 1:]))
 
             count += 1
 
@@ -135,4 +147,4 @@ def display_animation(vertices):
 
 framemod.initiate_pygame_frame()
 
-display_animation(vertices)
+display_animation(vertices_list)
