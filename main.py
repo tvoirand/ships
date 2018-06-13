@@ -11,13 +11,13 @@ import pygame.locals
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-def from_orbital_to_cartesian_coordinates(a, e, i, RAAN, om, t, mu):
+def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
     '''
     Converting from orbital parameters to cartesian coordinates.
     - Inputs:
             a         float   semi-major axis (km)
     		e         float   eccentricity (-)
-    		i         float   inclination (deg)
+    		inc         float   inclination (deg)
     		RAAN      float   right ascension of the ascending node (deg)
     		om        float   argument of periapsis (deg)
     		t         float   time spent since passage at periapsis (s)
@@ -27,7 +27,7 @@ def from_orbital_to_cartesian_coordinates(a, e, i, RAAN, om, t, mu):
     '''
 
     # converting angles from degrees to radians
-    i = i * np.pi / 180
+    inc = inc * np.pi / 180
     RAAN = RAAN * np.pi / 180
     om = om * np.pi / 180
 
@@ -54,16 +54,16 @@ def from_orbital_to_cartesian_coordinates(a, e, i, RAAN, om, t, mu):
 
     # computing position vector
     pos = np.asarray((
-        r * (np.cos(om + nu) * np.cos(RAAN) - np.sin(om + nu) * np.sin(RAAN) * np.cos(i)),
-        r * (np.cos(om + nu) * np.sin(RAAN) - np.sin(om + nu) * np.cos(RAAN) * np.cos(i)),
-        r * (np.sin(om + nu) * np.sin(i))
+        r * (np.cos(om + nu) * np.cos(RAAN) - np.sin(om + nu) * np.sin(RAAN) * np.cos(inc)),
+        r * (np.cos(om + nu) * np.sin(RAAN) - np.sin(om + nu) * np.cos(RAAN) * np.cos(inc)),
+        r * (np.sin(om + nu) * np.sin(inc))
     ))
 
     return pos
 
 a = 6000.0
 e = 0.0
-i = 20.0
+inc = 20.0
 raan = 0.0
 om = 0.0
 mu = 398600.0
@@ -87,7 +87,7 @@ for shift in range(0, 6000, 1000):
         vertices_list[ship_count][i, 1:] = SCALE * from_orbital_to_cartesian_coordinates(
             a,
             e,
-            i,
+            inc,
             raan,
             om,
             time_list[i],
