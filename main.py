@@ -1,65 +1,16 @@
 """
-main script for generative_art
+main script for ships.
 
-version of the 20180610
+version of the 20180613.
 """
 
 import numpy as np
 import framemod
+import scmod
 import pygame
 import pygame.locals
 from OpenGL.GL import *
 from OpenGL.GLU import *
-
-def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
-    '''
-    Converting from orbital parameters to cartesian coordinates.
-    - Inputs:
-            a         float   semi-major axis (km)
-    		e         float   eccentricity (-)
-    		inc         float   inclination (deg)
-    		RAAN      float   right ascension of the ascending node (deg)
-    		om        float   argument of periapsis (deg)
-    		t         float   time spent since passage at periapsis (s)
-    		mu	      float   gravitational parameter of the central body	(km3/s2)
-    - Outputs:
-    		pos   	  numpy array of floats (shape (3,)) (km)
-    '''
-
-    # converting angles from degrees to radians
-    inc = inc * np.pi / 180
-    RAAN = RAAN * np.pi / 180
-    om = om * np.pi / 180
-
-    # computing mean anomaly
-    n = np.sqrt(mu / np.power(a, 3.0))
-    M = n * t
-
-    # computing eccentric anomaly
-    E = [M]
-    for j in range(100):
-        E.append(E[j] + (M - E[j] + e * np.sin(E[j])) / (1 - e * np.cos(E[j])))
-        if(abs(E[j+1] - E[j]) < 1e-8):
-            E = E[j+1]
-            break
-
-    # computing true anomaly
-    nu = 2 * np.arctan2(
-            np.sqrt(1 - e) * np.cos(E / 2),
-            np.sqrt(1 + e) * np.sin(E / 2)
-        ) % (np.pi * 2)
-
-    # computing radius
-    r = a * (1 -np.power(e, 2.0)) / (1 + e * np.cos(nu))
-
-    # computing position vector
-    pos = np.asarray((
-        r * (np.cos(om + nu) * np.cos(RAAN) - np.sin(om + nu) * np.sin(RAAN) * np.cos(inc)),
-        r * (np.cos(om + nu) * np.sin(RAAN) - np.sin(om + nu) * np.cos(RAAN) * np.cos(inc)),
-        r * (np.sin(om + nu) * np.sin(inc))
-    ))
-
-    return pos
 
 a = 6000.0
 e = 0.0
@@ -67,8 +18,9 @@ inc = 20.0
 raan = 0.0
 om = 0.0
 mu = 398600.0
+planet_rotational_velocity = 360 / 86400 # degrees per second
 
-SCALE = 0.0005
+SCALE = 8e-8 * a
 
 vertices_list = []
 
@@ -84,7 +36,7 @@ for shift in range(0, 6000, 1000):
 
         vertices_list[ship_count][i, 0] = time_list[i]
 
-        vertices_list[ship_count][i, 1:] = SCALE * from_orbital_to_cartesian_coordinates(
+        vertices_list[ship_count][i, 1:] = SCALE * scmod.from_orbital_to_cartesian_coordinates(
             a,
             e,
             inc,
@@ -92,6 +44,11 @@ for shift in range(0, 6000, 1000):
             om,
             time_list[i],
             mu
+        )
+
+        vertices_list[ship_count][i, 1:] = scmod.rotate_frame_around_y(
+            vertices_list[ship_count][i, 1:],
+            planet_rotational_velocity * time_list[i]
         )
 
     ship_count += 1
