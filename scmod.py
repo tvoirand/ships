@@ -40,8 +40,8 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
 
     # computing true anomaly
     nu = 2 * np.arctan2(
-            np.sqrt(1 - e) * np.cos(E / 2),
-            np.sqrt(1 + e) * np.sin(E / 2)
+            np.sqrt(1 + e) * np.sin(E / 2),
+            np.sqrt(1 - e) * np.cos(E / 2)
         ) % (np.pi * 2)
 
     # computing radius
