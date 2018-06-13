@@ -1,7 +1,7 @@
 """
-builds a frame
+pygame framework building module.
 
-version of the 20180610
+version of the 20180610.
 """
 
 import pygame

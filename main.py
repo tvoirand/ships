@@ -11,12 +11,14 @@ import pygame
 import pygame.locals
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 a = 6000.0
-e = 0.0
-inc = 20.0
+e = 0.3
+inc = 40.0
 raan = 0.0
-om = 0.0
+om = 45.0
 mu = 398600.0
 planet_rotational_velocity = 360 / 86400 # degrees per second
 
@@ -28,7 +30,7 @@ ship_count = 0
 
 for shift in range(0, 6000, 1000):
 
-    time_list = np.arange(0, 86400, 100) + shift
+    time_list = np.arange(0, 3 * 86400, 50) + shift
 
     vertices_list.append(np.zeros((len(time_list), 4), dtype = np.float32))
 
@@ -105,3 +107,8 @@ def display_animation(vertices_list):
 framemod.initiate_pygame_frame()
 
 display_animation(vertices_list)
+
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.plot(vertices_list[0][:, 1], vertices_list[0][:, 2], vertices_list[0][:, 3])
+# plt.show()
