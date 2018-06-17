@@ -28,9 +28,9 @@ vertices_list = []
 
 ship_count = 0
 
-for shift in range(0, 6000, 1000):
+for shift in range(0, 45, 5):
 
-    time_list = np.arange(0, 3 * 86400, 50) + shift
+    time_list = np.arange(0, 3 * 86400, 50) + shift * 1000
 
     vertices_list.append(np.zeros((len(time_list), 4), dtype = np.float32))
 
@@ -41,7 +41,7 @@ for shift in range(0, 6000, 1000):
         vertices_list[ship_count][i, 1:] = SCALE * scmod.from_orbital_to_cartesian_coordinates(
             a,
             e,
-            inc,
+            inc + shift,
             raan,
             om,
             time_list[i],
