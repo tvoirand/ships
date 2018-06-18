@@ -1,19 +1,51 @@
 """
 science module for ships.
 
-version of the 20180613.
+version of the 20180618.
 """
 
 import numpy as np
 
-def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
+class Ship:
+    """
+    Class describing a ship.
+
+    The "vertices" attribute is an array containing (columns):
+    (time elapsed since passage at periapsis, x-coord, y-coord, z-coord)
+
+    Attributes:
+    -ship_count (class attribute)   integer
+    -id                             integer
+    -orbital_parameters             list of 5 floats (a, e, inc, raan, om)
+    -scale                          float
+    -vertices                       numpy array of floats (shape (nb_of_steps, 4))
+    """
+
+    ships_count = 0
+
+    def __init__(self, orbital_parameters, nb_of_steps):
+        """
+        Constructor of the Ship class.
+
+        Input:
+        -orbital_parameters     list of 5 floats (a, e, inc, raan, om)
+        -nb_of_steps            integer
+        """
+
+        self.id = Ship.ships_count
+        self.orbital_parameters = orbital_parameters
+        self.scale = 8e-8 * orbital_parameters[0]
+        self.vertices = np.zeros((nb_of_steps, 4))
+        Ship.ships_count += 1
+
+def from_orbital_to_cartesian_coordinates(a, e, inc, raan, om, t, mu):
     '''
     Converting from orbital parameters to cartesian coordinates.
     - Inputs:
             a         float   semi-major axis (km)
     		e         float   eccentricity (-)
     		inc       float   inclination (deg)
-    		RAAN      float   right ascension of the ascending node (deg)
+    		raan      float   right ascension of the ascending node (deg)
     		om        float   argument of periapsis (deg)
     		t         float   time spent since passage at periapsis (s)
     		mu	      float   gravitational parameter of the central body	(km3/s2)
@@ -23,7 +55,7 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
 
     # converting angles from degrees to radians
     inc = inc * np.pi / 180
-    RAAN = RAAN * np.pi / 180
+    raan = raan * np.pi / 180
     om = om * np.pi / 180
 
     # computing mean anomaly
@@ -49,9 +81,9 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, RAAN, om, t, mu):
 
     # computing position vector
     pos = np.asarray((
-        r * (np.cos(om + nu) * np.sin(RAAN) - np.sin(om + nu) * np.cos(RAAN) * np.cos(inc)),
+        r * (np.cos(om + nu) * np.sin(raan) - np.sin(om + nu) * np.cos(raan) * np.cos(inc)),
         r * (np.sin(om + nu) * np.sin(inc)),
-        r * (np.cos(om + nu) * np.cos(RAAN) - np.sin(om + nu) * np.sin(RAAN) * np.cos(inc))
+        r * (np.cos(om + nu) * np.cos(raan) - np.sin(om + nu) * np.sin(raan) * np.cos(inc))
     ))
 
     return pos
