@@ -34,7 +34,7 @@ class Ship:
 
         self.id = Ship.ships_count
         self.orbital_parameters = orbital_parameters
-        self.scale = 8e-8 * orbital_parameters[0]
+        self.scale = 2.5 / orbital_parameters[0]
         self.vertices = np.zeros((nb_of_steps, 4))
         Ship.ships_count += 1
 
