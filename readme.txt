@@ -1,7 +1,7 @@
 ships
 
-version 0.8 of the 20180620
+version 0.9 of the 20180620
 
 added in this version:
--counter renamed frame_count
--save_frame function added in framemod
+-image_to_video function added in framemod
+-option added to save video file (--vid)

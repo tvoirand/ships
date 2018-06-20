@@ -4,11 +4,12 @@ main script for ships.
 version of the 20180618.
 
 parameters:
--a      sem-major axis
+-a      semi-major axis
 -e      eccentricity
 -i      inclination
 -om     argument of periapsis
 -s      step duration
+--vid   make video option
 """
 
 import numpy as np
@@ -22,12 +23,13 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
-def display_animation(ships_list):
+def display_animation(ships_list, save_frames):
     """
     Displays animation.
 
     Input:
-    - ships_list    list of scmod.Ship
+    -ships_list     list of scmod.Ship
+    -save_frames    boolean
     """
 
     frame_count = 0
@@ -48,11 +50,21 @@ def display_animation(ships_list):
         # resetting counter to zero when whole array displayed
         if frame_count == (len(time_list) - 1):
 
-            frame_count = 0
+            if save_frames:
 
-            pygame.display.flip()
+                framemod.image_to_video()
 
-            pygame.time.wait(300)
+                pygame.quit()
+
+                quit()
+
+            else:
+
+                frame_count = 0
+
+                pygame.display.flip()
+
+                pygame.time.wait(300)
 
         else:
 
@@ -67,7 +79,9 @@ def display_animation(ships_list):
 
             pygame.display.flip()
 
-            framemod.save_frame(frame_count)
+            if save_frames:
+
+                framemod.save_frame(frame_count)
 
             pygame.time.wait(10)
 
@@ -77,6 +91,7 @@ parser.add_argument("-e", default = 0)
 parser.add_argument("-i", default = 0)
 parser.add_argument("-om", default = 0)
 parser.add_argument("-s", default = 50)
+parser.add_argument("--vid", action="store_true")
 args = parser.parse_args()
 
 a = float(args.a)
@@ -90,13 +105,16 @@ PLANET_ROT = 360 / 86400 # degrees per second
 
 step = float(args.s)
 
-time_list = np.arange(0, 1 * 86400, step)
+time_list = np.arange(0, 30000, step)
 
 ships_list = []
 
-for time_shift in np.arange(1e4, 1.5e4, 1e3):
+for time_shift in np.arange(1e4, 2e4, 1e3):
+    for inc_shift in np.arange(0, 90, 20):
 
-        ships_list.append(scmod.Ship([a, e, inc, raan, om], len(time_list)))
+
+
+        ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan, om], len(time_list)))
 
         ship = ships_list[scmod.Ship.ships_count - 1]
 
@@ -119,7 +137,9 @@ for time_shift in np.arange(1e4, 1.5e4, 1e3):
 
 framemod.initiate_pygame_frame()
 
-display_animation(ships_list)
+display_animation(ships_list, args.vid)
+
+
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
