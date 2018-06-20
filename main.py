@@ -30,7 +30,7 @@ def display_animation(ships_list):
     - ships_list    list of scmod.Ship
     """
 
-    count = 0
+    frame_count = 0
 
     while True:
 
@@ -46,9 +46,9 @@ def display_animation(ships_list):
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         # resetting counter to zero when whole array displayed
-        if count == (len(time_list) - 1):
+        if frame_count == (len(time_list) - 1):
 
-            count = 0
+            frame_count = 0
 
             pygame.display.flip()
 
@@ -58,11 +58,16 @@ def display_animation(ships_list):
 
             for ship in ships_list:
 
-                framemod.draw_line((ship.vertices[count, 1:], ship.vertices[count + 1, 1:]))
+                framemod.draw_line((
+                    ship.vertices[frame_count, 1:],
+                    ship.vertices[frame_count + 1, 1:]
+                ))
 
-            count += 1
+            frame_count += 1
 
             pygame.display.flip()
+
+            framemod.save_frame(frame_count)
 
             pygame.time.wait(10)
 
@@ -89,10 +94,9 @@ time_list = np.arange(0, 1 * 86400, step)
 
 ships_list = []
 
-for time_shift in np.arange(1e4, 3e4, 1e3):
-    for inc_shift in np.arange(0, 90, 20):
+for time_shift in np.arange(1e4, 1.5e4, 1e3):
 
-        ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan, om], len(time_list)))
+        ships_list.append(scmod.Ship([a, e, inc, raan, om], len(time_list)))
 
         ship = ships_list[scmod.Ship.ships_count - 1]
 

@@ -9,6 +9,22 @@ import pygame.locals
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
+import os
+
+def save_frame(frame_count):
+    """
+    Save current frame to file.
+    Input:
+    -count  integer
+    """
+
+    if not os.path.isdir("frames"):
+
+        os.mkdir("frames")
+
+    surface = pygame.display.get_surface()
+
+    pygame.image.save(surface, "frames/{}.png".format(frame_count))
 
 def draw_line(vertices):
     """

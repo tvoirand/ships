@@ -1,7 +1,7 @@
 ships
 
-version 0.7 of the 20180618
+version 0.8 of the 20180620
 
 added in this version:
--argument parser added
--scmod.ship class scale attribute modified
+-counter renamed frame_count
+-save_frame function added in framemod
