@@ -11,6 +11,7 @@ from OpenGL.GLU import *
 import numpy as np
 import os
 import cv2
+from datetime import datetime
 
 def image_to_video():
     """
@@ -42,8 +43,12 @@ def image_to_video():
 
             os.rename(folder_name + "/" + file, folder_name + "/" + leading_zeros + file)
 
-    folder_name = "temp"
-    video_name = "video.avi"
+    folder_name = "output/temp"
+    video_name = "output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-video.avi"
+
+    if not os.path.isdir(folder_name):
+
+        os.mkdir(folder_name)
 
     add_leading_zeros_to_fname(folder_name)
 
@@ -69,13 +74,13 @@ def save_frame(frame_count):
     -count  integer
     """
 
-    if not os.path.isdir("temp"):
+    if not os.path.isdir("output/temp"):
 
-        os.mkdir("temp")
+        os.mkdir("output/temp")
 
     surface = pygame.display.get_surface()
 
-    pygame.image.save(surface, "temp/{}.png".format(frame_count))
+    pygame.image.save(surface, "output/temp/{}.png".format(frame_count))
 
 def draw_line(vertices):
     """
