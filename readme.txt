@@ -1,6 +1,6 @@
 ships
 
-version 0.11 of the 20180629
+version 0.12 of the 20180716
 
 added in this version:
--gif creation function added
+- ability to use main as module added

@@ -1,7 +1,7 @@
 """
 main script for ships.
 
-version of the 20180618.
+version of the 20180716.
 
 parameters:
 -a      semi-major axis
@@ -45,7 +45,7 @@ def write_txt_file(a, e, i, raan, om, s, dur):
 
     with open("output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-info.txt", "w") as file:
 
-        file.write("ships version 0.10 \n")
+        file.write("ships version 0.12 \n")
         file.write("parameters used: \n")
         file.write(
         "a    (km)  {}\n".format(a)
@@ -121,72 +121,74 @@ def display_animation(ships_list, save_frames):
 
             pygame.time.wait(10)
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-a", default = 20000)
-parser.add_argument("-e", default = 0)
-parser.add_argument("-i", default = 0)
-parser.add_argument("-raan", default = 0)
-parser.add_argument("-om", default = 0)
-parser.add_argument("-s", default = 50)
-parser.add_argument("-dur", default = 86400)
-parser.add_argument("--vid", action="store_true")
-args = parser.parse_args()
+if __name__ == "__main__":
 
-a = float(args.a)
-e = float(args.e)
-inc = float(args.i)
-raan = float(args.raan)
-om = float(args.om)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", default = 20000)
+    parser.add_argument("-e", default = 0)
+    parser.add_argument("-i", default = 0)
+    parser.add_argument("-raan", default = 0)
+    parser.add_argument("-om", default = 0)
+    parser.add_argument("-s", default = 50)
+    parser.add_argument("-dur", default = 86400)
+    parser.add_argument("--vid", action="store_true")
+    args = parser.parse_args()
 
-MU_PLANET = 398600.0
-PLANET_ROT = 360 / 86400 # degrees per second
+    a = float(args.a)
+    e = float(args.e)
+    inc = float(args.i)
+    raan = float(args.raan)
+    om = float(args.om)
 
-step = float(args.s)
-dur = float(args.dur)
+    MU_PLANET = 398600.0
+    PLANET_ROT = 360 / 86400 # degrees per second
 
-time_list = np.arange(0, dur, step)
+    step = float(args.s)
+    dur = float(args.dur)
 
-ships_list = []
+    time_list = np.arange(0, dur, step)
 
-for raan_shift in np.arange(0, 360, 360):
-    for time_shift in np.arange(0, dur, dur):
-        for inc_shift in np.arange(0, 360, 360):
+    ships_list = []
 
-            ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan, om], len(time_list)))
+    for raan_shift in np.arange(0, 20, 20):
+        for time_shift in np.arange(0, dur, dur/10):
+            for inc_shift in np.arange(0, 360, 360):
 
-            ship = ships_list[scmod.Ship.ships_count - 1]
-            print(ship.orbital_parameters)
-            for i in range(len(time_list)):
+                ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan + raan_shift, om], len(time_list)))
 
-                ship.vertices[i, 0] = time_list[i] + time_shift
+                ship = ships_list[scmod.Ship.ships_count - 1]
 
-                ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
-                    ship.scale * scmod.from_orbital_to_cartesian_coordinates(
-                        ship.orbital_parameters[0],
-                        ship.orbital_parameters[1],
-                        ship.orbital_parameters[2],
-                        ship.orbital_parameters[3],
-                        ship.orbital_parameters[4],
-                        ship.vertices[i, 0],
-                        MU_PLANET
-                    ),
-                    PLANET_ROT * time_list[i]
-                )
+                for i in range(len(time_list)):
 
-if args.vid:
+                    ship.vertices[i, 0] = time_list[i] + time_shift
 
-    write_txt_file(a, e, inc, om, raan, step, dur)
+                    ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
+                        ship.scale * scmod.from_orbital_to_cartesian_coordinates(
+                            ship.orbital_parameters[0],
+                            ship.orbital_parameters[1],
+                            ship.orbital_parameters[2],
+                            ship.orbital_parameters[3],
+                            ship.orbital_parameters[4],
+                            ship.vertices[i, 0],
+                            MU_PLANET
+                        ),
+                        PLANET_ROT * time_list[i]
+                    )
 
-framemod.initiate_pygame_frame()
+    if args.vid:
 
-display_animation(ships_list, args.vid)
+        write_txt_file(a, e, inc, om, raan, step, dur)
+
+    framemod.initiate_pygame_frame()
+
+    display_animation(ships_list, args.vid)
 
 
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.plot(
-#     ships_list[0].vertices[:, 1],
-#     ships_list[0].vertices[:, 2],
-#     ships_list[0].vertices[:, 3]
-# )
-# plt.show()
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # ax.plot(
+    #     ships_list[0].vertices[:, 1],
+    #     ships_list[0].vertices[:, 2],
+    #     ships_list[0].vertices[:, 3]
+    # )
+    # plt.show()
