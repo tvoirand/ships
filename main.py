@@ -88,6 +88,8 @@ def display_animation(ships_list, save_frames):
 
                 framemod.image_to_video()
 
+                framemod.image_to_gif()
+
                 pygame.quit()
 
                 quit()
@@ -137,42 +139,43 @@ raan = float(args.raan)
 om = float(args.om)
 
 MU_PLANET = 398600.0
-PLANET_ROT = 0 # 360 / 86400 # degrees per second
+PLANET_ROT = 360 / 86400 # degrees per second
 
 step = float(args.s)
-duration = float(args.dur)
+dur = float(args.dur)
 
-time_list = np.arange(0, duration, step)
+time_list = np.arange(0, dur, step)
 
 ships_list = []
 
-for time_shift in np.arange(0, 5000, 500):
-    for inc_shift in np.arange(0, 360, 30):
+for raan_shift in np.arange(0, 360, 360):
+    for time_shift in np.arange(0, dur, dur):
+        for inc_shift in np.arange(0, 360, 360):
 
-        ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan, om], len(time_list)))
+            ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan, om], len(time_list)))
 
-        ship = ships_list[scmod.Ship.ships_count - 1]
+            ship = ships_list[scmod.Ship.ships_count - 1]
+            print(ship.orbital_parameters)
+            for i in range(len(time_list)):
 
-        for i in range(len(time_list)):
+                ship.vertices[i, 0] = time_list[i] + time_shift
 
-            ship.vertices[i, 0] = time_list[i] + time_shift
-
-            ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
-                ship.scale * scmod.from_orbital_to_cartesian_coordinates(
-                    ship.orbital_parameters[0],
-                    ship.orbital_parameters[1],
-                    ship.orbital_parameters[2],
-                    ship.orbital_parameters[3],
-                    ship.orbital_parameters[4],
-                    ship.vertices[i, 0],
-                    MU_PLANET
-                ),
-                PLANET_ROT * time_list[i]
-            )
+                ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
+                    ship.scale * scmod.from_orbital_to_cartesian_coordinates(
+                        ship.orbital_parameters[0],
+                        ship.orbital_parameters[1],
+                        ship.orbital_parameters[2],
+                        ship.orbital_parameters[3],
+                        ship.orbital_parameters[4],
+                        ship.vertices[i, 0],
+                        MU_PLANET
+                    ),
+                    PLANET_ROT * time_list[i]
+                )
 
 if args.vid:
 
-    write_txt_file(a, e, inc, om, raan, step, duration)
+    write_txt_file(a, e, inc, om, raan, step, dur)
 
 framemod.initiate_pygame_frame()
 

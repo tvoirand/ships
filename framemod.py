@@ -1,7 +1,7 @@
 """
 pygame framework building module.
 
-version of the 20180610.
+version of the 20180716.
 """
 
 import pygame
@@ -12,43 +12,40 @@ import numpy as np
 import os
 import cv2
 from datetime import datetime
+import imageio
+
+def add_leading_zeros_to_fname(folder_name):
+    """
+    Add leading zeros to files names so that they all have the same number of digits.
+    10 digits max.
+
+    Input:
+    -folder_name    string
+    """
+
+    files = [file for file in os.listdir(folder_name) if file.endswith(".png")]
+
+    max_digits = len(max(files, key=len))
+
+    for file in files:
+
+        leading_zeros = ""
+
+        missing_zeros = max_digits - len(file)
+
+        for i in range(missing_zeros):
+
+            leading_zeros += "0"
+
+        os.rename(folder_name + "/" + file, folder_name + "/" + leading_zeros + file)
 
 def image_to_video():
     """
     Creates video file from images stored in a folder.
     """
 
-    def add_leading_zeros_to_fname(folder_name):
-        """
-        Add leading zeros to files names so that they all have the same number of digits.
-        10 digits max.
-
-        Input:
-        -folder_name    string
-        """
-
-        files = [file for file in os.listdir(folder_name) if file.endswith(".png")]
-
-        max_digits = len(max(files, key=len))
-
-        for file in files:
-
-            leading_zeros = ""
-
-            missing_zeros = max_digits - len(file)
-
-            for i in range(missing_zeros):
-
-                leading_zeros += "0"
-
-            os.rename(folder_name + "/" + file, folder_name + "/" + leading_zeros + file)
-
     folder_name = "output/temp"
     video_name = "output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-video.avi"
-
-    if not os.path.isdir(folder_name):
-
-        os.mkdir(folder_name)
 
     add_leading_zeros_to_fname(folder_name)
 
@@ -66,6 +63,23 @@ def image_to_video():
 
     cv2.destroyAllWindows()
     video.release()
+
+def image_to_gif():
+    """
+    Creates gif from images stored in a folder.
+    """
+
+    folder_name = "output/temp"
+    video_name = "output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-animation.gif"
+
+    add_leading_zeros_to_fname(folder_name)
+
+    images = [
+        imageio.imread(os.path.join(folder_name, img)) \
+        for img in os.listdir(folder_name) if img.endswith(".png")
+    ]
+
+    imageio.mimsave(video_name, images, duration=1/30)
 
 def save_frame(frame_count):
     """
