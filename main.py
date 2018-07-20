@@ -26,17 +26,18 @@ import argparse
 from datetime import datetime
 import os
 
-def write_txt_file(a, e, i, raan, om, s, dur):
+def write_txt_file(a, e, i, raan, om, s, dur, shift_ranges):
     """
     Writes txt file containing parameters.
     Input:
-    -a      float
-    -e      float
-    -i      float
-    -raan   float
-    -om     float
-    -step   float
-    -dur    float
+    -a              float
+    -e              float
+    -i              float
+    -raan           float
+    -om             float
+    -step           float
+    -dur            float
+    -shif_ranges    dict
     """
 
     if not os.path.isdir("output"):
@@ -45,7 +46,7 @@ def write_txt_file(a, e, i, raan, om, s, dur):
 
     with open("output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-info.txt", "w") as file:
 
-        file.write("ships version 0.12 \n")
+        file.write("ships version 0.14 \n")
         file.write("parameters used: \n")
         file.write(
         "a    (km)  {}\n".format(a)
@@ -150,12 +151,45 @@ if __name__ == "__main__":
 
     ships_list = []
 
-    for time_shift in np.arange(0, dur, dur):
-        for a_shift in np.arange(0, 1000, 1000):
-            for e_shift in np.arange(0, 1, 1):
-                for inc_shift in np.arange(0, 360, 360):
-                    for raan_shift in np.arange(0, 360, 360):
-                        for om_shift in np.arange(0, 360, 360):
+    shift_ranges = {
+        "time":[dur * 0.5, dur * 1.5, dur],
+        "a":[a * 0.5, a * 1.5, a],
+        "e":[0, 1, 1],
+        "i":[i * 0.5, i * 1.5, i],
+        "raan":[0, 360, 360],
+        "om":[0, 360, 360]
+    }
+
+    for time_shift in np.arange(
+        shift_ranges["time"][0],
+        shift_ranges["time"][1],
+        shift_ranges["time"][2]
+    ):
+        for a_shift in np.arange(
+            shift_ranges["a"][0],
+            shift_ranges["a"][1],
+            shift_ranges["a"][2]
+        ):
+            for e_shift in np.arange(
+                shift_ranges["e"][0],
+                shift_ranges["e"][1],
+                shift_ranges["e"][2]
+            ):
+                for inc_shift in np.arange(
+                    shift_ranges["inc"][0],
+                    shift_ranges["inc"][1],
+                    shift_ranges["inc"][2]
+                ):
+                    for raan_shift in np.arange(
+                        shift_ranges["raan"][0],
+                        shift_ranges["raan"][1],
+                        shift_ranges["raan"][2]
+                    ):
+                        for om_shift in np.arange(
+                            shift_ranges["om"][0],
+                            shift_ranges["om"][1],
+                            shift_ranges["om"][2]
+                        ):
 
                             ships_list.append(
                                 scmod.Ship(
@@ -191,7 +225,7 @@ if __name__ == "__main__":
 
     if args.vid:
 
-        write_txt_file(a, e, inc, om, raan, step, dur)
+        write_txt_file(a, e, inc, om, raan, step, dur, shift_ranges)
 
     framemod.initiate_pygame_frame()
 
