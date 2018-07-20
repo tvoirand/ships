@@ -1,6 +1,7 @@
 ships
 
-version 0.11 of the 20180718
+version 0.13 of the 20180720
 
 added in this version:
--gif creation function added
+- coordinates problem fixed (error in scmod from_orbital_to_cartesian_coordinates position formula)
+- output duration and step length error fixed
