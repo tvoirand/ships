@@ -1,6 +1,7 @@
 ships
 
-version 0.14 of the 20180720
+version 0.15 of the 20180720
 
 added in this version:
-- shift values stored in shift_ranges dict
+- shift storage improved (values directly in dict instead of just bounds)
+- shift values written in output text file

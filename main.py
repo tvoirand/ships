@@ -46,17 +46,34 @@ def write_txt_file(a, e, i, raan, om, s, dur, shift_ranges):
 
     with open("output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-info.txt", "w") as file:
 
-        file.write("ships version 0.14 \n")
-        file.write("parameters used: \n")
+        file.write("ships version 0.15 \n\n")
+
+        file.write("time parameters: \n")
+        file.write(
+        "step (s)   {}\n".format(step)
+        + "dur  (s)   {}\n".format(dur)
+        )
+
+        file.write("\norbital parameters: \n")
         file.write(
         "a    (km)  {}\n".format(a)
         + "e    (-)   {}\n".format(e)
         + "i    (deg) {}\n".format(i)
         + "raan (deg) {}\n".format(raan)
         + "om   (deg) {}\n".format(om)
-        + "step (s)   {}\n".format(step)
-        + "dur  (s)   {}\n".format(dur)
         )
+
+        file.write("\nshift: \n")
+
+        for key in shift_ranges:
+
+            file.write("{:5s}".format(key))
+
+            for value in shift_ranges[key][:-1]:
+
+                file.write("{},".format(value))
+
+            file.write("{}\n".format(shift_ranges[key][-1]))
 
 def display_animation(ships_list, save_frames):
     """
@@ -152,44 +169,20 @@ if __name__ == "__main__":
     ships_list = []
 
     shift_ranges = {
-        "time":[dur * 0.5, dur * 1.5, dur],
-        "a":[a * 0.5, a * 1.5, a],
-        "e":[0, 1, 1],
-        "i":[i * 0.5, i * 1.5, i],
-        "raan":[0, 360, 360],
-        "om":[0, 360, 360]
+        "time":np.arange(dur * 0.5, dur * 1.5, dur/5),
+        "a":np.arange(a * 0.5, a * 1.5, a),
+        "e":np.arange(0, 1, 1),
+        "inc":np.arange(0, 360, 360),
+        "raan":np.arange(0, 360, 60),
+        "om":np.arange(0, 360, 360)
     }
 
-    for time_shift in np.arange(
-        shift_ranges["time"][0],
-        shift_ranges["time"][1],
-        shift_ranges["time"][2]
-    ):
-        for a_shift in np.arange(
-            shift_ranges["a"][0],
-            shift_ranges["a"][1],
-            shift_ranges["a"][2]
-        ):
-            for e_shift in np.arange(
-                shift_ranges["e"][0],
-                shift_ranges["e"][1],
-                shift_ranges["e"][2]
-            ):
-                for inc_shift in np.arange(
-                    shift_ranges["inc"][0],
-                    shift_ranges["inc"][1],
-                    shift_ranges["inc"][2]
-                ):
-                    for raan_shift in np.arange(
-                        shift_ranges["raan"][0],
-                        shift_ranges["raan"][1],
-                        shift_ranges["raan"][2]
-                    ):
-                        for om_shift in np.arange(
-                            shift_ranges["om"][0],
-                            shift_ranges["om"][1],
-                            shift_ranges["om"][2]
-                        ):
+    for time_shift in shift_ranges["time"]:
+        for a_shift in shift_ranges["a"]:
+            for e_shift in shift_ranges["e"]:
+                for inc_shift in shift_ranges["inc"]:
+                    for raan_shift in shift_ranges["raan"]:
+                        for om_shift in shift_ranges["om"]:
 
                             ships_list.append(
                                 scmod.Ship(
