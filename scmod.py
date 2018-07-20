@@ -1,7 +1,7 @@
 """
 science module for ships.
 
-version of the 20180618.
+version of the 20180720.
 """
 
 import numpy as np
@@ -50,7 +50,7 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, raan, om, t, mu):
     		t         float   time spent since passage at periapsis (s)
     		mu	      float   gravitational parameter of the central body	(km3/s2)
     - Outputs:
-    		pos   	  numpy array of floats (shape (3,)) (km) (! y, z, x)
+    		pos   	  numpy array of floats (shape (3,)) (km)
     '''
 
     # converting angles from degrees to radians
@@ -81,7 +81,7 @@ def from_orbital_to_cartesian_coordinates(a, e, inc, raan, om, t, mu):
 
     # computing position vector
     pos = np.asarray((
-        r * (np.cos(om + nu) * np.sin(raan) - np.sin(om + nu) * np.cos(raan) * np.cos(inc)),
+        r * (np.cos(om + nu) * np.sin(raan) + np.sin(om + nu) * np.cos(raan) * np.cos(inc)),
         r * (np.sin(om + nu) * np.sin(inc)),
         r * (np.cos(om + nu) * np.cos(raan) - np.sin(om + nu) * np.sin(raan) * np.cos(inc))
     ))
@@ -101,8 +101,8 @@ def rotate_frame_around_z(input_vector, angle):
     angle = angle * np.pi / 180
 
     output_vector = [
-        np.cos(angle) * input_vector[0] - np.sin(angle) * input_vector[1],
-        np.sin(angle) * input_vector[0] + np.cos(angle) * input_vector[1],
+        np.cos(angle) * input_vector[0] + np.sin(angle) * input_vector[1],
+        np.cos(angle) * input_vector[1] - np.sin(angle) * input_vector[0],
         input_vector[2]
     ]
 
@@ -121,9 +121,9 @@ def rotate_frame_around_y(input_vector, angle):
     angle = angle * np.pi / 180
 
     output_vector = [
-        np.cos(angle) * input_vector[0] + np.sin(angle) * input_vector[2],
+        np.cos(angle) * input_vector[0] - np.sin(angle) * input_vector[2],
         input_vector[1],
-        np.cos(angle) * input_vector[2] - np.sin(angle) * input_vector[0]
+        np.cos(angle) * input_vector[2] + np.sin(angle) * input_vector[0]
     ]
 
     return output_vector

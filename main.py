@@ -1,7 +1,7 @@
 """
 main script for ships.
 
-version of the 20180716.
+version of the 20180720.
 
 parameters:
 -a      semi-major axis
@@ -53,8 +53,8 @@ def write_txt_file(a, e, i, raan, om, s, dur):
         + "i    (deg) {}\n".format(i)
         + "raan (deg) {}\n".format(raan)
         + "om   (deg) {}\n".format(om)
-        + "dur  (s)   {}\n".format(step)
-        + "step (s)   {}\n".format(dur)
+        + "step (s)   {}\n".format(step)
+        + "dur  (s)   {}\n".format(dur)
         )
 
 def display_animation(ships_list, save_frames):
@@ -150,30 +150,44 @@ if __name__ == "__main__":
 
     ships_list = []
 
-    for raan_shift in np.arange(0, 20, 20):
-        for time_shift in np.arange(0, dur, dur/10):
-            for inc_shift in np.arange(0, 360, 360):
+    for time_shift in np.arange(0, dur, dur):
+        for a_shift in np.arange(0, 1000, 1000):
+            for e_shift in np.arange(0, 1, 1):
+                for inc_shift in np.arange(0, 360, 360):
+                    for raan_shift in np.arange(0, 360, 360):
+                        for om_shift in np.arange(0, 360, 360):
 
-                ships_list.append(scmod.Ship([a, e, inc + inc_shift, raan + raan_shift, om], len(time_list)))
+                            ships_list.append(
+                                scmod.Ship(
+                                    [
+                                        a + a_shift,
+                                        e + e_shift,
+                                        inc + inc_shift,
+                                        raan + raan_shift,
+                                        om + om_shift
+                                    ],
+                                    len(time_list)
+                                )
+                            )
 
-                ship = ships_list[scmod.Ship.ships_count - 1]
+                            ship = ships_list[scmod.Ship.ships_count - 1]
 
-                for i in range(len(time_list)):
+                            for i in range(len(time_list)):
 
-                    ship.vertices[i, 0] = time_list[i] + time_shift
+                                ship.vertices[i, 0] = time_list[i] + time_shift
 
-                    ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
-                        ship.scale * scmod.from_orbital_to_cartesian_coordinates(
-                            ship.orbital_parameters[0],
-                            ship.orbital_parameters[1],
-                            ship.orbital_parameters[2],
-                            ship.orbital_parameters[3],
-                            ship.orbital_parameters[4],
-                            ship.vertices[i, 0],
-                            MU_PLANET
-                        ),
-                        PLANET_ROT * time_list[i]
-                    )
+                                ship.vertices[i, 1:] = scmod.rotate_frame_around_y(
+                                    ship.scale * scmod.from_orbital_to_cartesian_coordinates(
+                                        ship.orbital_parameters[0],
+                                        ship.orbital_parameters[1],
+                                        ship.orbital_parameters[2],
+                                        ship.orbital_parameters[3],
+                                        ship.orbital_parameters[4],
+                                        ship.vertices[i, 0],
+                                        MU_PLANET
+                                    ),
+                                    PLANET_ROT * (time_list[i] + time_shift)
+                                )
 
     if args.vid:
 
