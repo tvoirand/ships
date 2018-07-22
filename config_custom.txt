@@ -1,0 +1,4 @@
+Custom configuration file for ships version 1.0 of the 20180722.
+
+
+inc (inclination, deg)                            = 0.0

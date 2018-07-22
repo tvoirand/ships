@@ -1,16 +1,11 @@
 """
 main script for ships.
 
-version of the 20180720.
+version of the 20180722.
 
-parameters:
--a      semi-major axis
--e      eccentricity
--i      inclination
--raan   right ascension of the ascending node
--om     argument of periapsis
--s      step duration
---vid   make video option
+optional arguments:
+  -h, --help      show this help message and exit
+  -config CONFIG  custom configuration file
 """
 
 import numpy as np
@@ -25,6 +20,32 @@ from mpl_toolkits.mplot3d import Axes3D
 import argparse
 from datetime import datetime
 import os
+import inspect
+
+def read_config(config_file, config_dict):
+    """
+    Read config file and store parameters in dictionnary.
+
+    Input:
+    -config_file    string
+    -config_dict     dictionnary
+    """
+
+    header_size = 3
+
+    with open(config_file, "r") as file:
+
+        file_contents = file.readlines()
+
+    for line in file_contents[header_size:]:
+
+        param = line.split("=")[0].split()[0]
+
+        value = line.split("=")[1].split()[0]
+
+        config_dict[param] = value
+
+    return config_dict
 
 def write_txt_file(a, e, i, raan, om, s, dur, shift_ranges):
     """
@@ -46,7 +67,7 @@ def write_txt_file(a, e, i, raan, om, s, dur, shift_ranges):
 
     with open("output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-info.txt", "w") as file:
 
-        file.write("ships version 0.15 \n\n")
+        file.write("ships version 1.0 \n\n")
 
         file.write("time parameters: \n")
         file.write(
@@ -84,6 +105,11 @@ def display_animation(ships_list, save_frames):
     -save_frames    boolean
     """
 
+    if os.path.dirname(inspect.getfile(inspect.currentframe())) == "":
+        output_dir = "output"
+    else:
+        output_dir = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/output"
+
     frame_count = 0
 
     while True:
@@ -102,11 +128,11 @@ def display_animation(ships_list, save_frames):
         # resetting counter to zero when whole array displayed
         if frame_count == (len(time_list) - 1):
 
-            if save_frames:
+            if save_frames == "True":
 
-                framemod.image_to_video()
+                framemod.image_to_video(output_dir)
 
-                framemod.image_to_gif()
+                framemod.image_to_gif(output_dir)
 
                 pygame.quit()
 
@@ -118,7 +144,7 @@ def display_animation(ships_list, save_frames):
 
                 pygame.display.flip()
 
-                pygame.time.wait(300)
+                pygame.time.wait(100)
 
         else:
 
@@ -133,48 +159,80 @@ def display_animation(ships_list, save_frames):
 
             pygame.display.flip()
 
-            if save_frames:
+            if save_frames == "True":
 
-                framemod.save_frame(frame_count)
+                framemod.save_frame(frame_count, output_dir)
 
             pygame.time.wait(10)
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-a", default = 20000)
-    parser.add_argument("-e", default = 0)
-    parser.add_argument("-i", default = 0)
-    parser.add_argument("-raan", default = 0)
-    parser.add_argument("-om", default = 0)
-    parser.add_argument("-s", default = 50)
-    parser.add_argument("-dur", default = 86400)
-    parser.add_argument("--vid", action="store_true")
+    parser = argparse.ArgumentParser("Orbital animations.")
+    parser.add_argument("-config", help="custom configuration file")
     args = parser.parse_args()
 
-    a = float(args.a)
-    e = float(args.e)
-    inc = float(args.i)
-    raan = float(args.raan)
-    om = float(args.om)
+    if os.path.dirname(inspect.getfile(inspect.currentframe())) == "":
+        config_default_file = "config_default.txt"
+    else:
+        config_default_file = os.path.dirname(inspect.getfile(inspect.currentframe())) \
+            + "/config_default.txt"
 
-    MU_PLANET = 398600.0
-    PLANET_ROT = 360 / 86400 # degrees per second
+    config = read_config(config_default_file, {})
 
-    step = float(args.s)
-    dur = float(args.dur)
+    if args.config != None:
+        config = read_config(args.config, config)
+
+    for key in config:
+
+        print(key, config[key])
+
+    a = float(config["a"])
+    e = float(config["e"])
+    inc = float(config["inc"])
+    raan = float(config["raan"])
+    om = float(config["om"])
+
+    MU_PLANET = float(config["mu_planet"])
+    PLANET_ROT = float(config["planet_rot"])
+
+    step = float(config["step"])
+    dur = float(config["dur"])
 
     time_list = np.arange(0, dur, step)
 
     ships_list = []
 
     shift_ranges = {
-        "time":np.arange(dur * 0.5, dur * 1.5, dur/5),
-        "a":np.arange(a * 0.5, a * 1.5, a),
-        "e":np.arange(0, 1, 1),
-        "inc":np.arange(0, 360, 360),
-        "raan":np.arange(0, 360, 60),
-        "om":np.arange(0, 360, 360)
+        "time":np.arange(
+            float(config["time_shift"].split(",")[0]),
+            float(config["time_shift"].split(",")[1]),
+            float(config["time_shift"].split(",")[2])
+        ),
+        "a":np.arange(
+            float(config["a_shift"].split(",")[0]),
+            float(config["a_shift"].split(",")[1]),
+            float(config["a_shift"].split(",")[2])
+        ),
+        "e":np.arange(
+            float(config["e_shift"].split(",")[0]),
+            float(config["e_shift"].split(",")[1]),
+            float(config["e_shift"].split(",")[2])
+        ),
+        "inc":np.arange(
+            float(config["inc_shift"].split(",")[0]),
+            float(config["inc_shift"].split(",")[1]),
+            float(config["inc_shift"].split(",")[2])
+        ),
+        "raan":np.arange(
+            float(config["raan_shift"].split(",")[0]),
+            float(config["raan_shift"].split(",")[1]),
+            float(config["raan_shift"].split(",")[2])
+        ),
+        "om":np.arange(
+            float(config["om_shift"].split(",")[0]),
+            float(config["om_shift"].split(",")[1]),
+            float(config["om_shift"].split(",")[2])
+        ),
     }
 
     for time_shift in shift_ranges["time"]:
@@ -216,13 +274,13 @@ if __name__ == "__main__":
                                     PLANET_ROT * (time_list[i] + time_shift)
                                 )
 
-    if args.vid:
+    if config["vid"] == "True":
 
         write_txt_file(a, e, inc, om, raan, step, dur, shift_ranges)
 
     framemod.initiate_pygame_frame()
 
-    display_animation(ships_list, args.vid)
+    display_animation(ships_list, config["vid"])
 
 
     # fig = plt.figure()

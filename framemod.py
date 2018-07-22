@@ -1,7 +1,7 @@
 """
 pygame framework building module.
 
-version of the 20180716.
+version of the 20180722.
 """
 
 import pygame
@@ -39,13 +39,16 @@ def add_leading_zeros_to_fname(folder_name):
 
         os.rename(folder_name + "/" + file, folder_name + "/" + leading_zeros + file)
 
-def image_to_video():
+def image_to_video(output_dir):
     """
     Creates video file from images stored in a folder.
+
+    Input:
+    -output_dir     string
     """
 
-    folder_name = "output/temp"
-    video_name = "output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-video.avi"
+    folder_name = output_dir + "/temp"
+    video_name = output_dir + "/" + datetime.now().strftime("%Y%m%d-%H%M") + "-video.avi"
 
     add_leading_zeros_to_fname(folder_name)
 
@@ -64,13 +67,16 @@ def image_to_video():
     cv2.destroyAllWindows()
     video.release()
 
-def image_to_gif():
+def image_to_gif(output_dir):
     """
     Creates gif from images stored in a folder.
+
+    Input:
+    -output_dir     string
     """
 
-    folder_name = "output/temp"
-    video_name = "output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-animation.gif"
+    folder_name = output_dir + "/temp"
+    video_name = output_dir + "/" + datetime.now().strftime("%Y%m%d-%H%M") + "-animation.gif"
 
     add_leading_zeros_to_fname(folder_name)
 
@@ -81,20 +87,21 @@ def image_to_gif():
 
     imageio.mimsave(video_name, images, duration=1/30)
 
-def save_frame(frame_count):
+def save_frame(frame_count, output_dir):
     """
     Save current frame to file.
     Input:
-    -count  integer
+    -count          integer
+    -output_dir     string
     """
 
-    if not os.path.isdir("output/temp"):
+    if not os.path.isdir(output_dir + "/temp"):
 
-        os.mkdir("output/temp")
+        os.mkdir(output_dir + "/temp")
 
     surface = pygame.display.get_surface()
 
-    pygame.image.save(surface, "output/temp/{}.png".format(frame_count))
+    pygame.image.save(surface, output_dir + "/temp/{}.png".format(frame_count))
 
 def draw_line(vertices):
     """
