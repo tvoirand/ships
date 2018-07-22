@@ -67,7 +67,7 @@ def write_txt_file(a, e, i, raan, om, s, dur, shift_ranges):
 
     with open("output/" + datetime.now().strftime("%Y%m%d-%H%M") + "-info.txt", "w") as file:
 
-        file.write("ships version 1.0 \n\n")
+        file.write("ships version 1.1 \n\n")
 
         file.write("time parameters: \n")
         file.write(
