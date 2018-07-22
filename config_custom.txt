@@ -1,4 +1,18 @@
-Custom configuration file for ships version 1.0 of the 20180722.
-
-
-inc (inclination, deg)                            = 0.0
+#Custom configuration file for ships version 1.0 of the 20180722.
+#Lines starting with # are skipped
+#
+step (step duration, s)                           = 500.0
+dur (simulation duration, s)                      = 86400.0
+#
+a (semi-major axis, km)                           = 42240.0
+e (eccentricity)                                  = 0.0
+inc (inclination, deg)                            = 60.0
+raan (right ascension of the ascending node, deg) = 0.0
+om (argument of periapsis, deg)                   = 0.0
+#
+time_shift                                        = 0,86400,43200
+a_shift                                           = 0,1,1
+e_shift                                           = 0,1,1
+inc_shift                                         = 0,1,1
+raan_shift                                        = 0,360,20
+om_shift                                          = 0,1,1

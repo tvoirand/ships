@@ -31,19 +31,19 @@ def read_config(config_file, config_dict):
     -config_dict     dictionnary
     """
 
-    header_size = 3
-
     with open(config_file, "r") as file:
 
         file_contents = file.readlines()
 
-    for line in file_contents[header_size:]:
+    for line in file_contents:
 
-        param = line.split("=")[0].split()[0]
+        if not line.startswith("#"):
 
-        value = line.split("=")[1].split()[0]
+            param = line.split("=")[0].split()[0]
 
-        config_dict[param] = value
+            value = line.split("=")[1].split()[0]
+
+            config_dict[param] = value
 
     return config_dict
 
@@ -144,7 +144,7 @@ def display_animation(ships_list, save_frames):
 
                 pygame.display.flip()
 
-                pygame.time.wait(100)
+                pygame.time.wait(10)
 
         else:
 
@@ -181,10 +181,6 @@ if __name__ == "__main__":
 
     if args.config != None:
         config = read_config(args.config, config)
-
-    for key in config:
-
-        print(key, config[key])
 
     a = float(config["a"])
     e = float(config["e"])
